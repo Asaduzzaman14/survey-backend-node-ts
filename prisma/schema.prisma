@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================= USER =================
+model User {
+  id String @id @default(uuid())
+
+  name     String
+  email    String  @unique
+  phone    String?
+  img      String?
+  password String
+  location String?
+  position String?
+
+  role     RoleType @default(USER)
+  isActive Boolean  @default(false)
+
+  surveyResponses SurveyResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ================= QUESTION =================
+model Question {
+  id          String       @id @default(uuid())
+  text        String
+  type        QuestionType
+  step        Int
+  required    Boolean      @default(false)
+  placeholder String?
+
+  dependsOnQuestionId String?
+  dependsOnValue      String?
+
+  options   Option[]
+  responses SurveyResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("questions")
+}
+
+// ================= OPTION =================
+model Option {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  value String
+  text  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  SurveyResponse SurveyResponse[]
+
+  @@map("options")
+}
+
+// ================= RESPONSE =================
+model Submition {
+  id String @id @default(uuid())
+
+  name String
+
+  surveyResponse SurveyResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("submitions")
+}
+
+// ================= SURVEY RESPONSE =================
+model SurveyResponse {
+  id String @id @default(uuid())
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  submitionId String
+  submition   Submition @relation(fields: [submitionId], references: [id], onDelete: Cascade)
+
+  answerText String? // For TEXT or TEXTAREA
+  optionId   String? // For RADIO / CHECKBOX / SINGLE / MULTIPLE
+  option     Option? @relation(fields: [optionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("surveyResponses")
+}
+
+// ================= ENUMS =================
+enum QuestionType {
+  TEXT // Free text
+  TEXTAREA // Long text
+  RADIO // Single choice
+  CHECKBOX // Single checkbox
+  CHECKBOX_GROUP // Multiple choice
+  DATE // Date input
+  SELECT // Date input
+}
+
+enum RoleType {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// npx prisma migrate dev --name changes
+
+// npx prisma generate
+
+// npx prisma studio
+
+//  prisma
+
+// $ npx prisma migrate dev --name migration-name --create-only
+// npx prisma migrate dev
+
+// npx prisma generate
+// npx prisma migrate deploy
