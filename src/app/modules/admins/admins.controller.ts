@@ -16,6 +16,20 @@ const getData = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getDetails = catchAsync(async (req: Request, res: Response) => {
+
+  const result = await Services.getDetails();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully retruve all details',
+    data: result,
+  });
+});
+
 export const Controller = {
   getData,
+  getDetails
 };

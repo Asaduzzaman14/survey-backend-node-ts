@@ -10,4 +10,10 @@ router.get(
   Controller.getData,
 );
 
+router.get(
+  '/details',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  Controller.getDetails,
+);
+
 export const AdminsRoutes = router;
