@@ -25,11 +25,11 @@ const updateOneInDB = catchAsync(async (req: Request, res: Response) => {
   const updatedData = req.body;
   const findData = await Services.getProfileById(user);
   if (req.file) {
-    updatedData.profileImage = `${config.baseUrl}/uploads/images/${req?.file?.filename}`;
+    updatedData.img = `${config.baseUrl}/uploads/images/${req?.file?.filename}`;
   }
-  if (findData?.profileImage && updatedData?.profileImage) {
+  if (findData?.img && updatedData?.img) {
 
-    const oldImageFileName = path.basename(findData.profileImage);
+    const oldImageFileName = path.basename(findData.img);
     const oldImagePath = path.join(process.cwd(), 'uploads', 'images', oldImageFileName);
 
     try {
