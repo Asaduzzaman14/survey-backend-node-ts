@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: hash-backend-dev
+    ports:
+      - '5000:5000'
+    env_file:
+      - .env
+    volumes:
+      - .:/app # host code -> container live reload
+      - /app/node_modules # container node_modules আলাদা রাখা
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: hash-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1414
+      POSTGRES_DB: infolife
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

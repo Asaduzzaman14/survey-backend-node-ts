@@ -9,7 +9,7 @@ import path from 'path';
 
 const app: Application = express();
 
-app.disable("x-powered-by");
+// app.disable("x-powered-by");
 
 const allowedOrigins = [
   'http://localhost:3000',
@@ -25,9 +25,9 @@ const limiter = rateLimit({
   max: 100, // প্রতি IP থেকে 100 রিকোয়েস্ট
 });
 
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1', routes);
 

@@ -46,6 +46,7 @@ const update = async (
       required,
       placeholder,
       options: {
+        deleteMany: {},
         create: options?.map((opt: { value: string; text: string }) => ({
           value: opt.value,
           text: opt.text,
@@ -80,7 +81,8 @@ const createAnswer = async (
     // Step 1: Create a Submition
     const submition = await tx.submition.create({
       data: {
-        name: answers[0].answer
+        name: answers[0].answer,
+        userId: user?.id,
       },
     });
 

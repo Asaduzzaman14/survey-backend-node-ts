@@ -36,7 +36,25 @@ const getSubmitions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
+const getUserSubmitions = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user
+  const filters = pick(req.query, userFilterAbleFields);
+  const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
+
+  const result = await Services.getUserSubmitions(filters, options, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully retrive data',
+    data: result,
+  });
+});
+
 export const Controller = {
   getData,
   getSubmitions,
+  getUserSubmitions
 };

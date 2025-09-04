@@ -11,6 +11,12 @@ router.get(
   Controller.getSubmitions,
 );
 
+router.get(
+  '/my-submition',
+  auth(ENUM_USER_ROLE.USER),
+  Controller.getUserSubmitions,
+);
+
 
 router.get(
   '/',
