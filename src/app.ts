@@ -14,6 +14,7 @@ const app: Application = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'https://front-end-coral-phi.vercel.app'
 ];
 
 app.use(cors({
