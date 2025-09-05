@@ -14,7 +14,8 @@ const app: Application = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://front-end-coral-phi.vercel.app'
+  'https://front-end-coral-phi.vercel.app',
+  'http://infolife.edulife.agency'
 ];
 
 app.use(cors({
@@ -41,7 +42,7 @@ app.use('/uploads', (req, res, next) => {
 }, express.static(path.join(__dirname, '../uploads')));
 
 
-
+// 
 
 //handle not found
 app.use((req: Request, res: Response, next: NextFunction) => {
