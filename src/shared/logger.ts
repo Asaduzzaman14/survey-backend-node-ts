@@ -16,7 +16,7 @@ const myFormat = printf(({ level, message, label, timestamp }) => {
 
 const logger = createLogger({
   level: 'info',
-  format: combine(label({ label: 'HashTake' }), timestamp(), myFormat),
+  format: combine(label({ label: 'ASAD' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
@@ -27,17 +27,17 @@ const logger = createLogger({
         'successes',
         'note-%DATE%-success.log',
       ),
-      datePattern: 'YYYY-DD-MM-HH',
-      zippedArchive: true,
+      datePattern: "YYYY-MM-DD", // প্রতিদিন নতুন ফাইল
+      zippedArchive: false,
       maxSize: '20m',
-      maxFiles: '14d',
+      maxFiles: '3d',
     }),
   ],
 });
 
 const errorlogger = createLogger({
   level: 'error',
-  format: combine(label({ label: 'HashTake' }), timestamp(), myFormat),
+  format: combine(label({ label: 'ASAD' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
@@ -48,12 +48,13 @@ const errorlogger = createLogger({
         'errors',
         'note-%DATE%-error.log',
       ),
-      datePattern: 'YYYY-DD-MM-HH',
-      zippedArchive: true,
+      datePattern: "YYYY-MM-DD", // প্রতিদিন নতুন ফাইল
+      zippedArchive: false,
       maxSize: '20m',
-      maxFiles: '14d',
+      maxFiles: '3d',
     }),
   ],
 });
 
 export { errorlogger, logger };
+

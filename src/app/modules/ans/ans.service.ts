@@ -1,5 +1,5 @@
 
-import { Prisma, Submition, SurveyResponse } from '@prisma/client';
+import { Prisma, Submition } from '@prisma/client';
 import { JwtPayload } from 'jsonwebtoken';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
@@ -13,8 +13,7 @@ import { IUserFilterRequest } from './ans.interface';
 const getAll = async (
   filters: IUserFilterRequest,
   options: IPaginationOptions,
-): Promise<IGenericResponse<SurveyResponse[]>> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+): Promise<IGenericResponse<Submition[]>> => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
@@ -44,13 +43,19 @@ const getAll = async (
       }),
     });
   }
-  const whereConditions: Prisma.SurveyResponseWhereInput =
+
+  const whereConditions: Prisma.SubmitionWhereInput =
     andCondations.length > 0 ? { AND: andCondations } : {};
 
-  const result = await prisma.surveyResponse.findMany({
+  const result = await prisma.submition.findMany({
     where: whereConditions,
     include: {
-      question: true
+      user: true,
+      surveyResponse: {
+        include: {
+          question: true,
+        },
+      },
     },
     skip,
     take: limit,
@@ -123,6 +128,7 @@ const getSubmitions = async (
   const result = await prisma.submition.findMany({
     where: whereConditions,
     include: {
+      user: true,
       surveyResponse: {
         include: {
           question: true

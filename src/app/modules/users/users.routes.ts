@@ -11,7 +11,6 @@ router.get('/:id', auth(ENUM_USER_ROLE.ADMIN), Controller.getUserById);
 
 router.patch(
   '/:id',
-  // validateRequest(DepositMethodValidation.createDepositMethodZodSchema),
   Controller.updateOneInDB,
 );
 
