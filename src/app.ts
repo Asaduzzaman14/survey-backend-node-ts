@@ -14,7 +14,8 @@ const app: Application = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://front-end-coral-phi.vercel.app'
+  'https://front-end-coral-phi.vercel.app',
+  'http://infolife.edulife.agency'
 ];
 
 app.use(cors({
