@@ -19,7 +19,7 @@ router.post(
 
 router.get(
   '/',
-  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
   Controller.getData,
 );
 
@@ -32,8 +32,14 @@ router.get(
 
 router.put(
   '/:id',
-  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   Controller.udpate,
+);
+
+router.delete(
+  '/:id',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  Controller.deleteData,
 );
 
 export const QuestionRoutes = router;

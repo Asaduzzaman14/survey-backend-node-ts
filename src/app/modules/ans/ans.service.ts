@@ -5,7 +5,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
-import { userSearchableFields } from '../users/users.constants';
+import { dataSearchableFields } from './ans.constants';
 import { IUserFilterRequest } from './ans.interface';
 
 
@@ -21,7 +21,7 @@ const getAll = async (
 
   if (searchTerm) {
     andCondations.push({
-      OR: userSearchableFields.map(field => ({
+      OR: dataSearchableFields.map(field => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -99,7 +99,7 @@ const getSubmitions = async (
 
   if (searchTerm) {
     andCondations.push({
-      OR: userSearchableFields.map(field => ({
+      OR: dataSearchableFields.map(field => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -169,19 +169,19 @@ const getUserSubmitions = async (
   options: IPaginationOptions,
   user: JwtPayload | null
 ): Promise<IGenericResponse<Submition[]>> => {
-  const { searchTerm, ...filterData } = filters;
+  const { searchTerm, day, ...filterData } = filters;
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
 
-  // if (user) {
-  //   filterData.userId = user.id
-  // }
+  if (user) {
+    filterData.userId = user.id
+  }
 
   const andCondations = [];
 
   if (searchTerm) {
     andCondations.push({
-      OR: userSearchableFields.map(field => ({
+      OR: dataSearchableFields.map(field => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -201,6 +201,21 @@ const getUserSubmitions = async (
           },
         };
       }),
+    });
+  }
+
+  if (day === "true") {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    andCondations.push({
+      createdAt: {
+        gte: startOfToday,
+        lte: endOfToday,
+      },
     });
   }
 
@@ -228,7 +243,6 @@ const getUserSubmitions = async (
         },
   });
 
-  // const total = await prisma.user.count();
   const total = await prisma.submition.count({
     where: {
       AND: [...(andCondations.length > 0 ? [{ AND: andCondations }] : [])],
@@ -245,8 +259,40 @@ const getUserSubmitions = async (
   };
 };
 
+
+
+
+
+const deleteSubmission = async (
+  id: string,
+  user: JwtPayload | null,
+): Promise<any> => {
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  // ডেটাবেজ থেকে submission খুঁজে বের করো
+  const submission = await prisma.submition.findUnique({
+    where: { id },
+  });
+  if (!submission) {
+    throw new Error("Submission not found");
+  }
+
+  await prisma.submition.delete({
+    where: { id },
+  });
+
+  return {
+    success: true,
+    message: "Submission deleted successfully",
+    id,
+  };
+};
+
 export const Services = {
   getAll,
   getSubmitions,
-  getUserSubmitions
+  getUserSubmitions,
+  deleteSubmission
 };

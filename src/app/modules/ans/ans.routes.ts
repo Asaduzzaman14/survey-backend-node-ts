@@ -17,6 +17,12 @@ router.get(
   Controller.getUserSubmitions,
 );
 
+router.delete(
+  '/delete-my-submition/:id',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  Controller.deleteData,
+);
+
 
 router.get(
   '/',

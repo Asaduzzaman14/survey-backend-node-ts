@@ -72,10 +72,25 @@ const udpate = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const deleteData = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id
+
+  const result = await Services.deleteData(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully deleted  Question',
+    data: result,
+  });
+});
+
+
 export const Controller = {
   create,
   getData,
   createAnswer,
   getDatabyId,
-  udpate
+  udpate,
+  deleteData
 };
