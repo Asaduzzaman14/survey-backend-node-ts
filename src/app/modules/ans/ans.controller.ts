@@ -3,12 +3,12 @@ import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
-import { userFilterAbleFields } from '../users/users.constants';
+import { dataFilterAbleFields, } from '../users/users.constants';
 import { Services } from './ans.service';
 
 
 const getData = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, userFilterAbleFields);
+  const filters = pick(req.query, dataFilterAbleFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getAll(filters, options);
@@ -23,7 +23,7 @@ const getData = catchAsync(async (req: Request, res: Response) => {
 
 
 const getSubmitions = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, userFilterAbleFields);
+  const filters = pick(req.query, dataFilterAbleFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getSubmitions(filters, options);
@@ -40,7 +40,7 @@ const getSubmitions = catchAsync(async (req: Request, res: Response) => {
 
 const getUserSubmitions = catchAsync(async (req: Request, res: Response) => {
   const user = req.user
-  const filters = pick(req.query, userFilterAbleFields);
+  const filters = pick(req.query, dataFilterAbleFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getUserSubmitions(filters, options, user);
@@ -53,8 +53,23 @@ const getUserSubmitions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteData = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user
+  const id = req.params.id;
+
+  const result = await Services.deleteSubmission(id, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully deleted data',
+    data: result,
+  });
+});
+
 export const Controller = {
   getData,
   getSubmitions,
-  getUserSubmitions
+  getUserSubmitions,
+  deleteData
 };

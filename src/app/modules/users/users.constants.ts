@@ -1,7 +1,7 @@
-export const userFilterAbleFields: string[] = ['searchTerm', 'status'];
+export const dataFilterAbleFields: string[] = ['searchTerm', 'createdAt', 'day', 'status'];
 
-export const userSearchableFields: string[] = [
+export const dataSearchableFields: string[] = [
   'name',
   'email',
-  'walletAddress',
+  'createdAt',
 ];

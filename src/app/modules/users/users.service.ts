@@ -6,7 +6,7 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
 import { IUserFilterRequest } from '../auth/auth.interface';
-import { userSearchableFields } from './users.constants';
+import { dataSearchableFields } from './users.constants';
 
 
 
@@ -22,7 +22,7 @@ const getAllFromDB = async (
 
   if (searchTerm) {
     andCondations.push({
-      OR: userSearchableFields.map(field => ({
+      OR: dataSearchableFields.map(field => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',

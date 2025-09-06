@@ -3,12 +3,12 @@ import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
-import { userFilterAbleFields } from './users.constants';
+import { dataFilterAbleFields } from './users.constants';
 import { Services } from './users.service';
 
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, userFilterAbleFields);
+  const filters = pick(req.query, dataFilterAbleFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getAllFromDB(filters, options);

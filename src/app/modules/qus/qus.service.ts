@@ -1,10 +1,9 @@
 
 import { Question, SurveyResponse } from '@prisma/client';
 import { JwtPayload } from 'jsonwebtoken';
-import redis from '../../../config/redis';
 import prisma from '../../../shared/prisma';
 
-const CACHE_KEY = "questions";
+// const CACHE_KEY = "questions";
 
 const create = async (
   data: any
@@ -26,7 +25,7 @@ const create = async (
     },
     include: { options: true },
   });
-  await redis.del(CACHE_KEY);
+  // await redis.del(CACHE_KEY);
 
   return question;
 };
@@ -57,7 +56,7 @@ const update = async (
     },
     include: { options: true },
   });
-  await redis.del(CACHE_KEY);
+  // await redis.del(CACHE_KEY);
 
   return question;
 };
@@ -65,11 +64,11 @@ const update = async (
 
 
 const getAll = async (): Promise<Question[]> => {
-  const cached = await redis.get(CACHE_KEY);
-  if (cached) {
-    console.log("⚡ Serving from Redis cache");
-    return JSON.parse(cached);
-  }
+  // const cached = await redis.get(CACHE_KEY);
+  // if (cached) {
+  //   // console.log("⚡ Serving from Redis cache");
+  //   return JSON.parse(cached);
+  // }
   const questions = await prisma.question.findMany({
     include: {
       options: true,
@@ -78,7 +77,7 @@ const getAll = async (): Promise<Question[]> => {
       step: "asc"
     }
   })
-  await redis.set(CACHE_KEY, JSON.stringify(questions), "EX", 60 * 5);
+  // await redis.set(CACHE_KEY, JSON.stringify(questions), "EX", 60 * 5);
 
   return questions;
 }
@@ -114,7 +113,7 @@ const createAnswer = async (
         })
       )
     );
-    await redis.del(CACHE_KEY);
+    // await redis.del(CACHE_KEY);
 
     return responses;
   });
@@ -137,10 +136,21 @@ const getDataById = async (id: string): Promise<Question | null> => {
 }
 
 
+const deleteData = async (id: string): Promise<Question | null> => {
+  const questions = await prisma.question.delete({
+    where: {
+      id
+    },
+  })
+  return questions;
+}
+
+
 export const Services = {
   create,
   update,
   getAll,
   createAnswer,
   getDataById,
+  deleteData
 };
