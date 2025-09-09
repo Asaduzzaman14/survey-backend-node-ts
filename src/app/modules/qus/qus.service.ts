@@ -10,7 +10,7 @@ import prisma from '../../../shared/prisma';
 const create = async (
   data: any
 ): Promise<any> => {
-  const { text, type, step, required, placeholder, options, dependsOnQuestionId,
+  const { text, type, step, required, serial = 100, placeholder, options, dependsOnQuestionId,
     dependsOnValue, } = data;
   const question = await prisma.question.create({
     data: {
@@ -19,7 +19,7 @@ const create = async (
       step,
       required,
       placeholder,
-      serial: 100,
+      serial,
       dependsOnQuestionId: dependsOnQuestionId || null,
       dependsOnValue: dependsOnValue || null,
       options: {
