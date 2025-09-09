@@ -94,6 +94,8 @@ const createAnswer = async (
   user: JwtPayload | null,
   answers: any[],
 ): Promise<SurveyResponse[]> => {
+  console.log(user,
+    answers);
 
   return await prisma.$transaction(async (tx) => {
     // Step 1: Create a Submition
