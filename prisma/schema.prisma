@@ -59,8 +59,9 @@ model Option {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  value String
-  text  String
+  value  String
+  text   String
+  parent String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,6 +120,7 @@ enum QuestionType {
   CHECKBOX_GROUP // Multiple choice
   DATE // Date input
   SELECT // Date input
+  SELECT_GROUP
 }
 
 enum RoleType {

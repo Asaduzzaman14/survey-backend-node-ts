@@ -1,6 +1,8 @@
 
 import { Question, SurveyResponse } from '@prisma/client';
+import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 
 // const CACHE_KEY = "questions";
@@ -8,7 +10,8 @@ import prisma from '../../../shared/prisma';
 const create = async (
   data: any
 ): Promise<any> => {
-  const { text, type, step, required, placeholder, options } = data;
+  const { text, type, step, required, placeholder, options, dependsOnQuestionId,
+    dependsOnValue, } = data;
   const question = await prisma.question.create({
     data: {
       text,
@@ -16,16 +19,18 @@ const create = async (
       step,
       required,
       placeholder,
+      dependsOnQuestionId: dependsOnQuestionId || null,
+      dependsOnValue: dependsOnValue || null,
       options: {
-        create: options?.map((opt: { value: string; text: string }) => ({
+        create: options?.map((opt: { value: string; text: string; parent: string | null }) => ({
           value: opt.value,
           text: opt.text,
+          parent: opt.parent || null,
         })),
       },
     },
     include: { options: true },
   });
-  // await redis.del(CACHE_KEY);
 
   return question;
 };
@@ -48,9 +53,10 @@ const update = async (
       placeholder,
       options: {
         deleteMany: {},
-        create: options?.map((opt: { value: string; text: string }) => ({
+        create: options?.map((opt: { value: string; text: string, parent: string }) => ({
           value: opt.value,
           text: opt.text,
+          parent: opt.parent || null,
         })),
       },
     },
@@ -137,6 +143,17 @@ const getDataById = async (id: string): Promise<Question | null> => {
 
 
 const deleteData = async (id: string): Promise<Question | null> => {
+
+  const hasSub = await prisma.question.findFirst({
+    where: {
+      dependsOnQuestionId: id
+    }
+  })
+
+  if (hasSub) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'has sub qus under this qus')
+  }
+
   const questions = await prisma.question.delete({
     where: {
       id
