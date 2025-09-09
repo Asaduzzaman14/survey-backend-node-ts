@@ -109,22 +109,28 @@ const createAnswer = async (
 
     // Step 2: Save all survey responses under this submition
     const responses = await Promise.all(
-      answers.map((a: any) =>
-        tx.surveyResponse.create({
+      answers.map((a: any) => {
+        let answerText: string;
+
+        if (typeof a.answer === "boolean") {
+          answerText = a.answer ? "Yes" : "No";
+        } else if (Array.isArray(a.answer)) {
+          answerText = a.answer.join(",");
+        } else {
+          answerText = a.answer;
+        }
+
+        return tx.surveyResponse.create({
           data: {
             userId: user?.id,
-            submitionId: submition.id, // 🔥 link with submition
+            submitionId: submition.id,
             questionId: a.questionId,
-            answerText: Array.isArray(a.answer)
-              ? a.answer.join(",")
-              : a.answer,
+            answerText,
             optionId: a.optionId || null,
           },
-        })
-      )
+        });
+      })
     );
-    // await redis.del(CACHE_KEY);
-
     return responses;
   });
 };
@@ -171,6 +177,7 @@ export const Services = {
   create,
   update,
   getAll,
+
   createAnswer,
   getDataById,
   deleteData
