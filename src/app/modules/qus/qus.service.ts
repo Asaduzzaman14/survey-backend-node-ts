@@ -19,6 +19,7 @@ const create = async (
       step,
       required,
       placeholder,
+      serial: 100,
       dependsOnQuestionId: dependsOnQuestionId || null,
       dependsOnValue: dependsOnValue || null,
       options: {
@@ -40,7 +41,7 @@ const update = async (
   id: string,
   data: any
 ): Promise<any> => {
-  const { text, type, step, required, placeholder, options } = data;
+  const { text, type, step, serial, required, placeholder, options } = data;
   const question = await prisma.question.update({
     where: {
       id
@@ -51,6 +52,7 @@ const update = async (
       step,
       required,
       placeholder,
+      serial,
       options: {
         deleteMany: {},
         create: options?.map((opt: { value: string; text: string, parent: string }) => ({
@@ -97,7 +99,7 @@ const createAnswer = async (
     // Step 1: Create a Submition
     const submition = await tx.submition.create({
       data: {
-        name: answers[0].answer,
+        name: answers[1].answer,
         userId: user?.id,
       },
     });

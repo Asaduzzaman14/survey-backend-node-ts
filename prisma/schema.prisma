@@ -38,6 +38,7 @@ model Question {
   text        String
   type        QuestionType
   step        Int
+  serial      Int?
   required    Boolean      @default(false)
   placeholder String?
 
