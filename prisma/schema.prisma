@@ -82,6 +82,7 @@ model Submition {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   surveyResponse SurveyResponse[]
+  answerData     Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

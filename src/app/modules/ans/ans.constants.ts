@@ -1,5 +1,8 @@
-export const dataFilterableFields: string[] = ['searchTerm', 'userId'];
 
-export const dataSearchableFields: string[] = ['email', 'walletAddress',];
+export const dataSearchableFields: string[] = ['email',];
+
+export const submitionFilterableFields: string[] = ['searchTerm', "fromDate", "toDate", "createdAt", 'name'];
+
+export const submitionSearchableFields: string[] = ['name',];
 
 

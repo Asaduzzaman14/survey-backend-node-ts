@@ -1,7 +1,6 @@
-export const dataFilterAbleFields: string[] = ['searchTerm', 'createdAt', 'day', 'status'];
+export const dataFilterAbleFields: string[] = ['searchTerm', 'name',];
 
 export const dataSearchableFields: string[] = [
   'name',
-  'email',
   'createdAt',
 ];

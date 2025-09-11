@@ -5,7 +5,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
-import { dataSearchableFields } from './ans.constants';
+import { dataSearchableFields, submitionSearchableFields } from './ans.constants';
 import { IUserFilterRequest } from './ans.interface';
 
 
@@ -91,22 +91,29 @@ const getSubmitions = async (
   filters: IUserFilterRequest,
   options: IPaginationOptions,
 ): Promise<IGenericResponse<Submition[]>> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  const { searchTerm, ...filterData } = filters;
+  const { searchTerm, fromDate, toDate, ...filterData } = filters;
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
   const andCondations = [];
 
   if (searchTerm) {
     andCondations.push({
-      OR: dataSearchableFields.map(field => ({
-        [field]: {
-          contains: searchTerm,
-          mode: 'insensitive',
+      OR: [
+        ...submitionSearchableFields.map(field => ({
+          [field]: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        })),
+        {
+          answerData: {
+            array_contains: [{ answer: searchTerm }], // ✅ Prisma JSON filter
+          },
         },
-      })),
+      ],
     });
   }
+
 
   // filter data
   if (Object.keys(filterData).length > 0) {
@@ -122,6 +129,27 @@ const getSubmitions = async (
     });
   }
 
+  // Date filter
+  if (fromDate && toDate) {
+    andCondations.push({
+      createdAt: {
+        gte: new Date(fromDate),
+        lte: new Date(toDate),
+      },
+    });
+  } else if (fromDate) {
+    andCondations.push({
+      createdAt: {
+        gte: new Date(fromDate),
+      },
+    });
+  } else if (toDate) {
+    andCondations.push({
+      createdAt: {
+        lte: new Date(toDate),
+      },
+    });
+  }
   const whereConditions: Prisma.SubmitionWhereInput =
     andCondations.length > 0 ? { AND: andCondations } : {};
 

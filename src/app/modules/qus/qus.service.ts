@@ -103,11 +103,11 @@ const createAnswer = async (
       data: {
         name: answers[1].answer,
         userId: user?.id,
+        answerData: answers
       },
     });
 
 
-    // Step 2: Save all survey responses under this submition
     const responses = await Promise.all(
       answers.map((a: any) => {
         let answerText: string;

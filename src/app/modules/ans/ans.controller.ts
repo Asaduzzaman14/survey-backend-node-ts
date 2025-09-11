@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
 import { dataFilterAbleFields, } from '../users/users.constants';
+import { submitionFilterableFields } from './ans.constants';
 import { Services } from './ans.service';
 
 
@@ -23,7 +24,7 @@ const getData = catchAsync(async (req: Request, res: Response) => {
 
 
 const getSubmitions = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, dataFilterAbleFields);
+  const filters = pick(req.query, submitionFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getSubmitions(filters, options);
