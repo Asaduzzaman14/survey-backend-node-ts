@@ -92,18 +92,36 @@ const getAll = async (): Promise<Question[]> => {
 
 const createAnswer = async (
   user: JwtPayload | null,
-  answers: any[],
+  answers: { questionId: string; answer: string }[],
 ): Promise<SurveyResponse[]> => {
-  console.log(user,
-    answers);
 
   return await prisma.$transaction(async (tx) => {
-    // Step 1: Create a Submition
+
+    const questionIds = answers.map((a) => a.questionId);
+
+    const questions = await tx.question.findMany({
+      where: { id: { in: questionIds } },
+      select: { id: true, text: true },
+    });
+
+    const enrichedAnswers = answers.map((ans) => {
+      const q = questions.find((q) => q.id === ans.questionId);
+      return {
+        ...ans,
+        questionText: q?.text || null,
+      };
+    });
+
+    const studentName =
+      enrichedAnswers.find(
+        (a) => a.questionText?.trim() === "শিক্ষার্থীর নাম"
+      )?.answer ?? answers[1]?.answer ?? "Unnamed";
+
     const submition = await tx.submition.create({
       data: {
-        name: answers[1].answer,
+        name: studentName,
         userId: user?.id,
-        answerData: answers
+        answerData: enrichedAnswers
       },
     });
 
