@@ -1,0 +1,96 @@
+import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
+import PDFDocument from 'pdfkit';
+import { submitionFilterableFields } from './app/modules/ans/ans.constants';
+import { Services } from './app/modules/ans/ans.service';
+import pick from './shared/pick';
+
+export const generatePdf = async (req: Request, res: Response) => {
+    try {
+        const filters = pick(req.query, submitionFilterableFields);
+        const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
+        const result = await Services.getSubmitions(filters, options);
+
+        const doc = new PDFDocument({ size: 'A4', margin: 10 });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="submission.pdf"`);
+
+        // বাংলা ফন্ট
+        const fontPath = path.join(__dirname, './NotoSansBengali-Regular.ttf');
+        if (fs.existsSync(fontPath)) {
+            doc.registerFont('Bangla', fontPath);
+            doc.font('Bangla');
+        } else {
+            console.warn('Bangla font not found, default font will be used');
+        }
+
+        // Title
+        doc.fontSize(18).text('Submission PDF', { align: 'center' });
+        doc.moveDown(2);
+
+        // Table config
+        const headers = ['SL', 'Date', 'User', 'Guardian Name', 'Mobile', 'Alternative Mobile', 'Upazila', 'Area'];
+        const rowHeight = 35;
+        const startX = 10;
+        let startY = 100;
+
+        const columnWidths = [20, 60, 100, 100, 75, 75, 80, 80];
+
+
+        const drawHeader = () => {
+            let x = startX;
+            headers.forEach((h, i) => {
+                doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
+                doc.fontSize(10).text(h, x + 2, startY + 7, { width: columnWidths[i] - 6, align: 'center' });
+                x += columnWidths[i];
+            });
+        };
+
+        drawHeader();
+
+        // Draw rows
+        result.data.forEach((d: any, index: number) => {
+            startY += rowHeight;
+            // Check for page break
+            if (startY + rowHeight > doc.page.height - 50) {
+                doc.addPage();
+                startY = 50;
+                drawHeader();
+                startY += rowHeight;
+            }
+
+            const survey = d.surveyResponse || [];
+            const guardian = survey.find((a: any) => a.question.text == 'Guardian Name')?.answerText || '-';
+            const mobile = survey.find((a: any) => a.question.text == 'Mobile')?.answerText || '-';
+            const altMobile = survey.find((a: any) => a.question.text == 'Alternative Mobile')?.answerText || '-';
+            const upjela = survey.find((a: any) => a.question.text == 'Upazila')?.answerText || '-';
+            const area = survey.find((a: any) => a.question.text.trim() === 'Area')?.answerText || '-';
+
+            const rowCells = [
+                (index + 1).toString(),
+                new Date(d.createdAt).toLocaleDateString(),
+                `${d.user.email}\n${d.user.name}`,
+                guardian,
+                mobile,
+                altMobile,
+                upjela,
+                area,
+            ];
+
+            let x = startX;
+            rowCells.forEach((cell, i) => {
+                doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
+                doc.fontSize(10).text(cell, x + 3, startY + 5, { width: columnWidths[i] - 6, align: 'center' });
+                x += columnWidths[i];
+            });
+        });
+
+        doc.pipe(res);
+        doc.end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'PDF generate failed' });
+    }
+};

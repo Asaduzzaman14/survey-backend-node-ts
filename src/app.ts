@@ -6,6 +6,7 @@ import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import routes from './app/routes';
 
 import path from 'path';
+import { generatePdf } from './pdfDw';
 
 const app: Application = express();
 
@@ -33,6 +34,8 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1', routes);
+
+app.use('/pdf', generatePdf);
 
 app.use(globalErrorHandler);
 

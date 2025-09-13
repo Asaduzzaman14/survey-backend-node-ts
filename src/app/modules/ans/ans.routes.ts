@@ -31,4 +31,11 @@ router.get(
 );
 
 
+router.post(
+  '/pdf',
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  Controller.pdf,
+);
+
+
 export const AnsRoutes = router;
