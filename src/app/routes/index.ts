@@ -4,6 +4,7 @@ import { AnsRoutes } from '../modules/ans/ans.routes';
 import { authRoutes } from '../modules/auth/auth.routes';
 import { profileRoutes } from '../modules/profile/profile.routes';
 import { QuestionRoutes } from '../modules/qus/qus.routes';
+import { reviewRoutes } from '../modules/surveyData/surveyData.routes';
 import { UsersRoutes } from '../modules/users/users.routes';
 
 const router = express.Router();
@@ -32,6 +33,10 @@ const moduleRoutes = [
   {
     path: '/answers',
     route: AnsRoutes,
+  },
+  {
+    path: '/save-date',
+    route: reviewRoutes,
   },
 ];
 

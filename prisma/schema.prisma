@@ -24,9 +24,10 @@ model User {
 
   surveyResponses SurveyResponse[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  submition Submition[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  submition  Submition[]
+  surveyData SurveyData[]
 
   @@index([createdAt])
   @@map("users")
@@ -111,6 +112,24 @@ model SurveyResponse {
   updatedAt DateTime @updatedAt
 
   @@map("surveyResponses")
+}
+
+model SurveyData {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  description String?
+  rating      Int? // optional numeric rating (e.g., 1–5)
+  location    String? // where review was made
+  reviewDate  DateTime? // custom date (optional)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("surveyData")
 }
 
 // ================= ENUMS =================
