@@ -17,8 +17,10 @@ export const generatePdf = async (req: Request, res: Response) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="submission.pdf"`);
 
-        // বাংলা ফন্ট
-        const fontPath = path.join(__dirname, './NotoSansBengali-Regular.ttf');
+        const fontPath = path.join(process.cwd(), 'NotoSansBengali-Regular.ttf');
+
+        console.log(fontPath);
+
         if (fs.existsSync(fontPath)) {
             doc.registerFont('Bangla', fontPath);
             doc.font('Bangla');
@@ -36,7 +38,7 @@ export const generatePdf = async (req: Request, res: Response) => {
         const startX = 10;
         let startY = 100;
 
-        const columnWidths = [20, 60, 100, 100, 75, 75, 80, 80];
+        const columnWidths = [20, 60, 80, 105, 70, 70, 77, 80];
 
 
         const drawHeader = () => {
@@ -71,7 +73,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             const rowCells = [
                 (index + 1).toString(),
                 new Date(d.createdAt).toLocaleDateString(),
-                `${d.user.email}\n${d.user.name}`,
+                d.user.name,
                 guardian,
                 mobile,
                 altMobile,
