@@ -43,7 +43,7 @@ const getSubmitions = catchAsync(async (req: Request, res: Response) => {
 
 const getUserSubmitions = catchAsync(async (req: Request, res: Response) => {
   const user = req.user
-  const filters = pick(req.query, dataFilterAbleFields);
+  const filters = pick(req.query, submitionFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortOrder', 'sortBy']);
 
   const result = await Services.getUserSubmitions(filters, options, user);
