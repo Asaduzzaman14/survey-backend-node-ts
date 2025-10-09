@@ -19,4 +19,8 @@ router.patch(
   validateRequest(ProfileValidation.update),
   ProfileController.updateOneInDB,
 );
+
+
+router.get('/summery', auth(ENUM_USER_ROLE.USER), ProfileController.getSummery);
+
 export const profileRoutes = router;

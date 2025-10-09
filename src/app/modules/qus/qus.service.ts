@@ -114,7 +114,7 @@ const createAnswer = async (
 
     const studentName =
       enrichedAnswers.find(
-        (a) => a.questionText?.trim() === "শিক্ষার্থীর নাম"
+        (a) => a.questionText?.trim() === "Guardian Name"
       )?.answer ?? answers[1]?.answer ?? "Unnamed";
 
     const submition = await tx.submition.create({

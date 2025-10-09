@@ -129,27 +129,43 @@ const getSubmitions = async (
     });
   }
 
-  // Date filter
+  const BD_OFFSET = 6 * 60 * 60 * 1000;
+
+  const convertToBDTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return new Date(date.getTime() - BD_OFFSET);
+  };
+
   if (fromDate && toDate) {
+    const bdFrom = convertToBDTime(fromDate);
+    const bdTo = convertToBDTime(toDate);
+    bdTo.setHours(23, 59, 59, 999);
+
     andCondations.push({
       createdAt: {
-        gte: new Date(fromDate),
-        lte: new Date(toDate),
+        gte: bdFrom,
+        lte: bdTo,
       },
     });
   } else if (fromDate) {
+    const bdFrom = convertToBDTime(fromDate);
     andCondations.push({
       createdAt: {
-        gte: new Date(fromDate),
+        gte: bdFrom,
       },
     });
   } else if (toDate) {
+    const bdTo = convertToBDTime(toDate);
+    bdTo.setHours(23, 59, 59, 999);
     andCondations.push({
       createdAt: {
-        lte: new Date(toDate),
+        lte: bdTo,
       },
     });
   }
+
+
+
   const whereConditions: Prisma.SubmitionWhereInput =
     andCondations.length > 0 ? { AND: andCondations } : {};
 
@@ -197,7 +213,7 @@ const getUserSubmitions = async (
   options: IPaginationOptions,
   user: JwtPayload | null
 ): Promise<IGenericResponse<Submition[]>> => {
-  const { searchTerm, day, ...filterData } = filters;
+  const { searchTerm, day, fromDate, toDate, ...filterData } = filters;
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
 
@@ -244,6 +260,24 @@ const getUserSubmitions = async (
         gte: startOfToday,
         lte: endOfToday,
       },
+    });
+  }
+
+
+  // ✅ Filter by date range (fromDate & toDate)
+  if (fromDate || toDate) {
+    const dateFilter: any = {};
+
+    if (fromDate) {
+      dateFilter.gte = new Date(`${fromDate}T00:00:00.000Z`);
+    }
+
+    if (toDate) {
+      dateFilter.lte = new Date(`${toDate}T23:59:59.999Z`);
+    }
+
+    andCondations.push({
+      createdAt: dateFilter,
     });
   }
 

@@ -8,20 +8,52 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
 import { IUserFilterRequest } from './profile.interface';
 
-const getProfile = async (user: JwtPayload | null): Promise<User | null> => {
+const getProfile = async (user: JwtPayload | null): Promise<any | null> => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
   }
 
   const result = await prisma.user.findUnique({
     where: { id: user.id },
-
   });
+
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
   }
 
-  return result;
+
+  const bdOffset = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
+  const now = new Date(Date.now() + bdOffset);
+
+  const startOfDay = new Date(now);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(now);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  const [totalCount, todayCount] = await Promise.all([
+    prisma.submition.count({
+      where: {
+        userId: user.userId,
+      },
+    }),
+    prisma.submition.count({
+      where: {
+        userId: user.userId,
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    }),
+  ]);
+
+  return {
+    ...result,
+    total: totalCount,
+    today: todayCount,
+  };
 };
 
 
@@ -101,7 +133,47 @@ type UserTreeNode = {
 };
 
 
+
+
+const getSummary = async (user: JwtPayload | null) => {
+  if (!user || !user.userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
+  }
+  const bdOffset = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
+  const now = new Date(Date.now() + bdOffset);
+
+  const startOfDay = new Date(now);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(now);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  const [totalCount, todayCount] = await Promise.all([
+    prisma.submition.count({
+      where: {
+        userId: user.userId,
+      },
+    }),
+    prisma.submition.count({
+      where: {
+        userId: user.userId,
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    }),
+  ]);
+
+  return {
+    total: totalCount,
+    today: todayCount,
+  };
+};
+
 export const Services = {
   getProfile,
   getProfileById,
+  getSummary
 };

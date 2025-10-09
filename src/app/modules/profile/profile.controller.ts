@@ -54,7 +54,26 @@ const updateOneInDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
+
+
+
+
+const getSummery = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await Services.getSummary(user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile summary retrieved successfully',
+    data: result,
+  });
+});
+
 export const ProfileController = {
   getProfile,
   updateOneInDB,
+  getSummery
 };
