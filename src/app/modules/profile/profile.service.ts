@@ -35,12 +35,12 @@ const getProfile = async (user: JwtPayload | null): Promise<any | null> => {
   const [totalCount, todayCount] = await Promise.all([
     prisma.submition.count({
       where: {
-        userId: user.userId,
+        userId: user.id,
       },
     }),
     prisma.submition.count({
       where: {
-        userId: user.userId,
+        userId: user.id,
         createdAt: {
           gte: startOfDay,
           lte: endOfDay,
