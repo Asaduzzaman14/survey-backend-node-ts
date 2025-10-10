@@ -62,6 +62,9 @@ const getAllReviews = async (user: JwtPayload | null) => {
   if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
 
   const reviews = await prisma.surveyData.findMany({
+    include: {
+      user: true
+    },
     orderBy: { createdAt: 'desc' },
   });
 
