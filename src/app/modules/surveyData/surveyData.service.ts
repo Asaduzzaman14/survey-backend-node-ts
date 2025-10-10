@@ -57,9 +57,21 @@ const deleteReview = async (user: JwtPayload | null, id: string) => {
   return { id };
 };
 
+
+const getAllReviews = async (user: JwtPayload | null) => {
+  if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+
+  const reviews = await prisma.surveyData.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return reviews;
+};
+
 export const ReviewService = {
   createReview,
   getMyReviews,
   updateReview,
   deleteReview,
+  getAllReviews
 };
