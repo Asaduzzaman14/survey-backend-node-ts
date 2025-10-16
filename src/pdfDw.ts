@@ -29,23 +29,23 @@ export const generatePdf = async (req: Request, res: Response) => {
         }
 
         // Title
-        doc.fontSize(14).text('Submission PDF', { align: 'center' });
+        doc.fontSize(18).text('Submission PDF', { align: 'center' });
         doc.moveDown(2);
 
         // Table config
         const headers = ['SL', 'Date', 'User', 'Guardian Name', 'Mobile', 'Alternative Mobile', 'Upazila', 'Area', "Status"];
-        const rowHeight = 28;
+        const rowHeight = 35;
         const startX = 10;
         let startY = 100;
 
-        const columnWidths = [20, 60, 80, 105, 70, 70, 77, 80];
+        const columnWidths = [20, 55, 75, 85, 68, 65, 70, 70, 80];
 
 
         const drawHeader = () => {
             let x = startX;
             headers.forEach((h, i) => {
                 doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
-                doc.fontSize(9).text(h, x + 2, startY + 7, { width: columnWidths[i] - 6, align: 'center' });
+                doc.fontSize(10).text(h, x + 2, startY + 7, { width: columnWidths[i] - 6, align: 'center' });
                 x += columnWidths[i];
             });
         };
@@ -69,7 +69,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             const altMobile = survey.find((a: any) => a.question.text == 'Alternative Mobile')?.answerText || '-';
             const upjela = survey.find((a: any) => a.question.text == 'Upazila')?.answerText || '-';
             const area = survey.find((a: any) => a.question.text.trim() === 'Area')?.answerText || '-';
-            const status = survey.find((a: any) => a.question.text.trim() === 'Status')?.answerText || '-';
+            const status = survey.find((a: any) => a.question.text.trim() == 'Status')?.answerText || '-';
 
             const rowCells = [
                 (index + 1).toString(),
@@ -86,7 +86,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             let x = startX;
             rowCells.forEach((cell, i) => {
                 doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
-                doc.fontSize(8.5).text(cell, x + 3, startY + 5, { width: columnWidths[i] - 6, align: 'center' });
+                doc.fontSize(10).text(cell, x + 3, startY + 5, { width: columnWidths[i] - 6, align: 'center' });
                 x += columnWidths[i];
             });
         });
