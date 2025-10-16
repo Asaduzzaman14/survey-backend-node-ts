@@ -18,9 +18,6 @@ export const generatePdf = async (req: Request, res: Response) => {
         res.setHeader('Content-Disposition', `attachment; filename="submission.pdf"`);
 
         const fontPath = path.join(process.cwd(), 'NotoSansBengali-Regular.ttf');
-
-        console.log(fontPath);
-
         if (fs.existsSync(fontPath)) {
             doc.registerFont('Bangla', fontPath);
             doc.font('Bangla');
@@ -28,34 +25,46 @@ export const generatePdf = async (req: Request, res: Response) => {
             console.warn('Bangla font not found, default font will be used');
         }
 
-        // Title
-        doc.fontSize(18).text('Submission PDF', { align: 'center' });
-        doc.moveDown(2);
+        // --- Title ---
+        doc.fontSize(14).text('Submission PDF', { align: 'center' }); // reduced from 18 → 14
+        doc.moveDown(1.5);
 
-        // Table config
-        const headers = ['SL', 'Date', 'User', 'Guardian Name', 'Mobile', 'Alternative Mobile', 'Upazila', 'Area'];
-        const rowHeight = 35;
+        // --- Table Config ---
+        const headers = [
+            'SL',
+            'Date',
+            'User',
+            'Guardian Name',
+            'Mobile',
+            'Alternative Mobile',
+            'Upazila',
+            'Area',
+            'Status',
+        ];
+        const rowHeight = 28; // reduced height
         const startX = 10;
-        let startY = 100;
-
+        let startY = 80;
         const columnWidths = [20, 60, 80, 105, 70, 70, 77, 80];
-
 
         const drawHeader = () => {
             let x = startX;
             headers.forEach((h, i) => {
                 doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
-                doc.fontSize(10).text(h, x + 2, startY + 7, { width: columnWidths[i] - 6, align: 'center' });
+                doc.fontSize(9).text(h, x + 2, startY + 7, {
+                    width: columnWidths[i] - 6,
+                    align: 'center',
+                });
                 x += columnWidths[i];
             });
         };
 
         drawHeader();
 
-        // Draw rows
+        // --- Table Rows ---
         result.data.forEach((d: any, index: number) => {
             startY += rowHeight;
-            // Check for page break
+
+            // Page break
             if (startY + rowHeight > doc.page.height - 50) {
                 doc.addPage();
                 startY = 50;
@@ -69,6 +78,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             const altMobile = survey.find((a: any) => a.question.text == 'Alternative Mobile')?.answerText || '-';
             const upjela = survey.find((a: any) => a.question.text == 'Upazila')?.answerText || '-';
             const area = survey.find((a: any) => a.question.text.trim() === 'Area')?.answerText || '-';
+            const status = survey.find((a: any) => a.question.text.trim() === 'Status')?.answerText || '-';
 
             const rowCells = [
                 (index + 1).toString(),
@@ -79,12 +89,16 @@ export const generatePdf = async (req: Request, res: Response) => {
                 altMobile,
                 upjela,
                 area,
+                status,
             ];
 
             let x = startX;
             rowCells.forEach((cell, i) => {
                 doc.rect(x, startY, columnWidths[i], rowHeight).stroke();
-                doc.fontSize(10).text(cell, x + 3, startY + 5, { width: columnWidths[i] - 6, align: 'center' });
+                doc.fontSize(8.5).text(cell, x + 3, startY + 5, {
+                    width: columnWidths[i] - 6,
+                    align: 'center',
+                });
                 x += columnWidths[i];
             });
         });
